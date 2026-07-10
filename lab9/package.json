@@ -1,0 +1,24 @@
+{
+  "name": "bai2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon --inspect app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.3",
+    "express-handlebars": "^6.0.2"
+  },
+  "devDependencies": {
+    "grunt": "^1.5.2",
+    "grunt-contrib-cssmin": "^4.0.0",
+    "grunt-contrib-less": "^3.0.0",
+    "grunt-contrib-uglify": "^5.2.1",
+    "grunt-hashres": "^0.4.1",
+    "nodemon": "^2.0.15"
+  }
+}
