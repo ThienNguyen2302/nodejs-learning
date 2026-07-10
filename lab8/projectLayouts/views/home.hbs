@@ -1,0 +1,136 @@
+<div class="container-fluid">
+  {{#if flash}}
+    <div id="flash" class="alert alert-{{flash.type}} text-center w-25 mx-auto my-3">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <span><strong>{{flash.message}}</strong></span>
+    </div>
+  {{/if}}
+    <div class="container my-3">
+    <h4 class="my-5 text-primary text-center text-uppercase">Danh sách Sinh Viên</h4>
+    <a class="btn btn-success btn-sm my-4" href="/add">Thêm Sinh Viên</a>
+    <p>Chọn một Sinh Viên để xem chi tiết</p>
+    <table class="table table-striped border">
+        <thead>
+        <tr>
+            <th>STT</th>
+            <th>Họ và tên</th>
+            <th>Giới tính</th>
+            <th>Tuổi</th>
+            <th>Email</th>
+            <th>Lớp</th>
+            <th>Thao tác</th>
+        </tr>
+        </thead>
+        <tbody>
+            {{#each students}}
+                <tr id="{{this._id}}">
+                    <td>{{inc @index}}</td>
+                    <td><a href="/profile/{{this._id}}">{{this.name}}</a></td>
+                    <td>{{this.gender}}</td>
+                    <td>{{this.age}}</td>
+                    <td>{{this.email}}</td>
+                    <td>{{this.class}}</td>
+                    <td>
+                        <button data-id="{{this._id}}" data-address="{{this.address}}" data-class="{{this.class}}" data-name="{{this.name}}" data-gender="{{this.gender}}" data-age="{{this.age}}" data-email="{{this.email}}"  class="btn btn-sm btn-outline-primary btn-edit">Chỉnh sửa</button>
+                        <button data-id="{{this._id}}" data-name="{{this.name}}" class="btn btn-sm btn-outline-danger btn-delete">Xóa</button>
+                    </td> 
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    <p id="total">Tổng số Sinh Viên: <strong class="text-danger">{{students.length}}</strong></p>
+</div>
+</div>
+
+<div style="display: none;" id="flash-alert" class="alert alert-success text-center w-25 mx-auto my-3">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <span>Đã xóa sinh viên <strong></strong></span>
+</div>
+
+<!-- Confirm delete -->
+<div class="modal fade" id="confirm-delete">
+    <div class="modal-dialog">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Xóa sinh viên</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+          Bạn có chắc rằng muốn xóa <strong></strong>?
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button data-id="" type="button" class="btn btn-danger" id="confirm-delete-btn">Xóa</button>
+          <button type="button" class="btn btn-dark" data-dismiss="modal">Đóng</button>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+<!-- End Confirm delete -->
+
+<!-- Update user -->
+<div class="modal fade" id="confirm-edit">
+    <div class="modal-dialog">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Cập nhật thông tin sinh viên</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+            
+                <div class="form-group">
+                    <label for="user">Họ tên</label>
+                    <input value="" class="form-control" type="text" placeholder="Nhập tên sinh viên" id="name" name="name">
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" class="custom-control-input" id="gender-male" name="gender" value="male">
+                        <label class="custom-control-label" for="gender-male">Nam</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" class="custom-control-input" id="gender-female" name="gender" value="female">
+                        <label class="custom-control-label" for="gender-female">Nữ</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="age">Tuổi</label>
+                    <input value="20" maxlength="3" class="form-control" type="number" placeholder="Nhập tuổi" min="18" max="100" id="age" name="age">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input value="tri@gmail.com" disabled class="form-control" type="text" placeholder="Nhập email" id="email" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="address">Địa Chỉ</label>
+                    <input value="" class="form-control" type="text" placeholder="Nhập địa chỉ sinh viên" id="address" name="address">
+                </div>
+                <div class="form-group">
+                    <label for="class">Lớp</label>
+                    <input value="" class="form-control" type="text" placeholder="Nhập tên sinh viên" id="class" name="class">
+                </div>
+                <div class="alert-danger" id="edit-error"></div>
+            
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button id="confirm-edit-btn" type="button" class="btn btn-primary">Cập nhật</button>
+          <button type="button" class="btn btn-dark" data-dismiss="modal">Đóng</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+<!-- End Update user -->
+
+<script src="./js/home.js"></script>
