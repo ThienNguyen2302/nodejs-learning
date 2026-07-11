@@ -1,0 +1,5 @@
+install generator: npm install express-generator -g (installed on this device)
+create expressjs app: express "myWeb" --"template" (ejs or hbs)
+cd to folder contain app
+upgrate to newest version: npm update
+fix vulnerable file: npm audit fix --force

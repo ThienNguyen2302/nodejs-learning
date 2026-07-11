@@ -1,0 +1,76 @@
+<h2>Vacation Photo Contest</h2>
+<form
+  class="form-horizontal"
+  role="form"
+  enctype="multipart/form-data"
+  method="POST"
+  action="/vacation-photo"
+>
+  <input type="hidden" name="_csrf" value="{{csrf}}" />
+  <div class="form-group">
+    <label for="name">Tên sản phẩm</label>
+    <div class="col-sm-4">
+      <input
+        name="name"
+        value="{{name}}"
+        required
+        class="form-control"
+        type="text"
+        placeholder="Tên sản phẩm"
+        id="name"
+      />
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="price">Giá bán</label>
+    <div class="col-sm-4">
+      <input
+        name="price"
+        value="{{price}}"
+        required
+        class="form-control"
+        type="number"
+        placeholder="Giá bán"
+        id="price"
+      />
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="desc">Mô tả</label>
+    <div class="col-sm-4">
+      <textarea
+        id="desc"
+        name="desc"
+        rows="4"
+        class="form-control"
+        placeholder="Mô tả"
+      >{{desc}}</textarea>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="fieldPhoto" class="col-sm-2 controllabel">Vacation photo</label>
+    <div class="col-sm-4">
+      <input
+        type="file"
+        class="form-control"
+        required
+        accept="image/*"
+        id="fieldPhoto"
+        name="photo"
+      />
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-4">
+      <button type="submit" class="btn btn-primary">Register</button>
+    </div>
+  </div>
+</form>
+
+{{#if flash}}
+<div class="alert alert-dismissible alert-{{flash.type}}">
+<button type="button" class="close"
+data-dismiss="alert" aria-hidden="true">&times ; <button>
+<strong>{{flash.intro}}</strong> {{{flash.message}}}
+</div>
+{{/if}}
