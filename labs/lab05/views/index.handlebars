@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Danh sách người dùng</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+  <div class="container my-3">
+    <h4 class="my-5 text-primary text-center text-uppercase">Danh sách người dùng</h4>
+    <a class="btn btn-success btn-sm my-4" href="/add">Thêm người dùng</a>
+    <p>Chọn một người dùng để xem chi tiết</p>
+    <table class="table table-striped border">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Họ và tên</th>
+          <th>Giới tính</th>
+          <th>Tuổi</th>
+          <th>Email</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each users}}
+        <tr id="{{this.id}}">
+          <td>{{inc @index}}</td>
+          <td><a href="/profile/{{this.id}}">{{this.name}}</a></td>
+          <td>{{this.gender}}</td>
+          <td>{{this.age}}</td>
+          <td>{{this.email}}</td>
+          <td>
+            <button data-id="{{this.id}}" data-name="{{this.name}}" data-gender="{{this.gender}}"
+              data-age="{{this.age}}" data-email="{{this.email}}" class="btn btn-sm btn-outline-primary btn-edit">Chỉnh
+              sửa</button>
+            <button data-id="{{this.id}}" data-name="{{this.name}}"
+              class="btn btn-sm btn-outline-danger btn-delete">Xóa</button>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    <p>Tổng số người dùng: <strong class="text-danger">{{users.length}}</strong></p>
+  </div>
+
+  <div style="display: none;" id="flash-alert" class="alert alert-success text-center w-25 mx-auto my-3">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <span>Đã xóa người dùng <strong></strong></span>
+  </div>
+
+  {{#if successFlash}}
+  <div id="successFlash" class="alert alert-success text-center w-25 mx-auto my-3">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <span><strong>{{successFlash}}</strong></span>
+  </div>
+  {{/if}}
+
+  {{#if errorFlash}}
+  <div id="errorFlash" class="alert alert-danger text-center w-25 mx-auto my-3">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <span><strong>{{errorFlash}}</strong></span>
+  </div>
+  {{/if}}
+
+
+  <!-- Confirm delete -->
+  <div class="modal fade" id="confirm-delete">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Xóa người dùng</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          Bạn có chắc rằng muốn xóa <strong></strong>?
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button data-id="" type="button" class="btn btn-danger" id="confirm-delete-btn">Xóa</button>
+          <button type="button" class="btn btn-dark" data-dismiss="modal">Đóng</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- End Confirm delete -->
+
+
+  <!-- Update user -->
+  <div class="modal fade" id="confirm-edit">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Cập nhật thông tin người dùng</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+
+          <div class="form-group">
+            <label for="user">Họ tên</label>
+            <input value="" class="form-control" type="text" placeholder="Nhập tên người dùng" id="name" name="name">
+          </div>
+          <div class="form-group">
+            <div class="custom-control custom-radio custom-control-inline">
+              <input type="radio" class="custom-control-input" id="gender-male" name="gender" value="male">
+              <label class="custom-control-label" for="gender-male">Nam</label>
+            </div>
+            <div class="custom-control custom-radio custom-control-inline">
+              <input type="radio" class="custom-control-input" id="gender-female" name="gender" value="female">
+              <label class="custom-control-label" for="gender-female">Nữ</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="age">Tuổi</label>
+            <input value="20" maxlength="3" class="form-control" type="number" placeholder="Nhập tuổi" min="18"
+              max="100" id="age" name="age">
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input value="tri@gmail.com" class="form-control" type="text" placeholder="Nhập email" id="email"
+              name="email">
+          </div>
+          <div class="alert-danger" id="edit-error"></div>
+
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button id="confirm-edit-btn" type="button" class="btn btn-primary">Cập nhật</button>
+          <button type="button" class="btn btn-dark" data-dismiss="modal">Đóng</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- End Update user -->
+
+
+  <script>
+    $('#errorFlash').fadeOut(2000)
+    $('#successFlash').fadeOut(2000)
+    $('.btn-delete').click(e => {
+      const btn = e.target
+      const id = btn.dataset.id
+      const name = btn.dataset.name
+      $('#confirm-delete .modal-body strong').html(name)
+      $('#confirm-delete-btn').attr('data-id', id)
+      $('#confirm-delete-btn').attr('data-name', name)
+      $('#confirm-delete').modal("show")
+    })
+
+    $('#confirm-delete-btn').click(e => {
+
+      $('#confirm-delete').modal("hide")
+      const btn = e.target
+      const id = btn.dataset.id
+      const name = btn.dataset.name
+      fetch('http://localhost:8080/delete/' + id, {
+        method: 'POST',
+
+      }).then(res => res.json())
+        .then(json => {
+          if (json.code === 0) {
+            $(`tr#${id}`).remove()
+            $('#flash-alert strong').html(name)
+            $('#flash-alert').show()
+            setTimeout(() => {
+              $('#flash-alert').fadeOut(2000)
+            }, 1000);
+          }
+        })
+        .catch(e => console.log(e))
+    })
+
+    $('.btn-edit').click(e => {
+      const btn = e.target
+      const gender = btn.dataset.gender
+      $('#name').val(btn.dataset.name)
+      $('#age').val(btn.dataset.age)
+      $('#email').val(btn.dataset.email)
+      if (gender === "male")
+        $("#gender-male").prop("checked", true)
+      else
+        $("#gender-female").prop("checked", true)
+
+      $("#confirm-edit-btn").attr('data-id', btn.dataset.id)
+      $('#confirm-edit').modal('show')
+    })
+
+    $("#confirm-edit-btn").click(e => {
+      let regex = /^([_\-\.0-9a-zA-Z]+)@([_\-\.0-9a-zA-Z]+)\.([a-zA-Z]){2,7}$/;
+      const btn = e.target
+      const id = btn.dataset.id
+      let email = $('#email').val()
+      let age = $('#age').val()
+      let name = $('#name').val()
+      let err = ""
+      let gender = $("input[type = 'radio']:checked");
+      if (name === "") {
+        err = "Vui lòng nhập tên người dùng"
+      }
+      else if (age === "") {
+        err = "Vui lòng nhập tuổi người dùng"
+      }
+      else if (Number.isInteger(age) || isNaN(age)) {
+        err = "Tuổi người dùng phải là số"
+      }
+      else if (Number(age) < 18 || Number(age) > 100) {
+        err = "Tuổi người dùng phải từ 18 đến 100"
+      }
+      else if (gender.length <= 0) {
+        err = "Vui lòng chọn giới tính người dùng"
+      }
+      else if (email === "") {
+        err = "Vui lòng nhập email người dùng"
+      }
+      else if (!regex.test(email)) {
+        err = "Email người dùng không hợp lệ"
+      }
+
+      if (err) {
+        $("#edit-error").addClass("alert")
+        $("#edit-error").html(err)
+      }
+      else {
+        var checkbox = document.getElementsByName("gender");
+        let valueGender;
+        for (var i = 0; i < checkbox.length; i++) {
+          if (checkbox[i].checked === true) {
+            valueGender = checkbox[i].value
+          }
+        }
+        let user = {
+          email: email,
+          name: name,
+          gender: valueGender,
+          age: parseInt(age)
+        }
+        console.log(user)
+        fetch('http://localhost:8080/edit/' + id, {
+          method: "post",
+          headers: {
+              {{!-- 'Content-Type': 'application/x-www-form-urlencoded' --}
+    }
+              'Content-Type': 'application/json'
+            },
+      body: JSON.stringify(user)
+        }).then(res => res.json())
+      .then(json => {
+        if (json.code != 0) {
+          $("#edit-error").addClass("alert")
+          $("#edit-error").html(json.message)
+        }
+        else {
+          location.reload()
+        }
+      })
+      .catch(e => console.log(e))
+      }
+    })
+  </script>
+
+</body>
+
+</html>
