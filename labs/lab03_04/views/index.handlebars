@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Trang chủ - Danh sách sản phẩm</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+    <div class="container my-3">
+        <h4 class="text-primary">Danh sách sản phẩm</h4>
+        <a href="/add" class="btn btn-success btn-sm my-2">Thêm sản phẩm</a>
+        <p>Chọn một sản phẩm cụ thể để xem chi tiết</p>
+        <table class="table table-striped">
+
+            <thead>
+                <tr>
+                    <td>STT</td>
+                    <td>Name</td>
+                    <td>Price</td>
+                    <td>Action</td>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each products as | product |}}
+                <tr id="{{product.id}}">
+                    <td>{{@index}}</td>
+                    <td><a href="/product/{{product.id}}">{{product.name}}</a></td>
+                    <td>{{product.price}}</td>
+                    <td>
+                        <a href="/edit/{{product.id}}">Chỉnh sửa</a> |
+                        <a data-id="{{product.id}}" data-name="{{product.name}}" class="delete-btn"
+                            href="/remove/{{product.id}}">Xóa</a>
+                    </td>
+                </tr>
+                {{/each}}
+
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <hp class="modal-title">Xóa sản phẩm</hp>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc rằng muốn xóa <strong class="product-name">iPhone XS MAX</strong> ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger btn-comfirm">Xóa</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        $('tbody .delete-btn').click(e => {
+            e.preventDefault();
+            let name = $(e.target).data('name')
+            let id = $(e.target).data('id')
+
+            // show detail of product 
+            $("#myModal .product-name").html(name)
+            $("#myModal .btn-comfirm").attr('data-id', id)
+
+            // show dialog 
+            $("#myModal").modal('show')
+        })
+
+        $("#myModal .btn-comfirm").click(e => {
+            let id = e.target.dataset.id
+            $("#myModal").modal('hide')
+            deleteProduct(id)
+        })
+        function deleteProduct(id) {
+            fetch('http://localhost:8080/delete', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `id=${encodeURIComponent(id)}`
+            }
+            ).then(res => res.json())
+                .then(json => {
+                    if (json.code === 0) {
+                        console.log("done")
+                        $(`tr#${id}`).remove()
+                    }
+                    else {
+                        console.log(json.message)
+                    }
+                })
+                .catch(e => console.log(e))
+        }
+    </script>
+
+</body>
+
+</html>
