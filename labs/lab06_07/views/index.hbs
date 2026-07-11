@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>File Managements</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+        integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        .fa,
+        .fas {
+            color: #858585;
+        }
+
+        .fa-folder {
+            color: rgb(74, 158, 255);
+        }
+
+        i.fa,
+        table i.fas {
+            font-size: 16px;
+            margin-right: 6px;
+        }
+
+        i.action {
+            cursor: pointer;
+        }
+
+        a {
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row align-items-center py-5">
+            <div class="col-6">
+                <h3>
+                    File Manager</h2>
+            </div>
+            <div class="col-6" data-dir="{{currentDir}}" id="user">
+                <div class="dropdown text-right">
+                    Xin chào <a class="dropdown-toggle text-primary" data-toggle="dropdown">{{user.name}}</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">
+                            <i class="fas fa-info-circle"></i>
+                            &nbsp;&nbsp;Cập nhật thông tin
+                        </a>
+                        <a class="dropdown-item" href="#">
+                            <i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp; Đăng xuất</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{#if flash}}
+        <div class="alert alert-{{flash.type}} alert-dismissible fade show">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{flash.message}}
+        </div>
+        {{/if}}
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="#">Products</a></li>
+            <li class="breadcrumb-item active">Accessories</li>
+        </ol>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <span class="fa fa-search"></span>
+                </span>
+            </div>
+            <input type="text" class="form-control" placeholder="Search">
+        </div>
+        <div class="btn-group my-3">
+            <button type="button" class="btn btn-light border" id="create_folder">
+                <i class="fas fa-folder-plus"></i> New folder
+            </button>
+            <button type="button" class="btn btn-light border" id="create_file">
+                <i class="fas fa-file"></i> Create text file
+            </button>
+        </div>
+        <table class="table table-hover border">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Last modified</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{!-- <tr>
+                    <td>
+                        <i class="fa fa-folder"></i>
+                        <a href="#">Document</a>
+                    </td>
+                    <td>Folder</td>
+                    <td>-</td>
+                    <td>02-12-2019</td>
+                    <td>
+                        <span><i class="fa fa-download action"></i></button>
+                            <span><i class="fa fa-edit action"></i></button>
+                                <span><i class="fa fa-trash action"></i></button>
+                    </td>
+                </tr> --}}
+                {{#each files}}
+                <tr>
+                    <td>
+                        <i class="{{this.icon}}"></i>
+                        <a href="{{this.supath}}">{{getName this.name this.ext}}</a>
+                    </td>
+                    <td>{{this.type}}</td>
+                    <td>{{this.size}} Byte</td>
+                    <td>{{this.lastModify}}</td>
+                    <td data-file="{{this.name}}" data-ext="{{this.ext}}">
+                        <span><i class="fa fa-download action download"></i></span>
+                        <span><i class="fa fa-edit action rename"></i></span>
+                        <span><i class="fa fa-trash action delete"></i></span>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <div class="border rounded mb-3 mt-5 p-3">
+            <h4>File upload</h4>
+            <div class="form-group">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="attachment">
+                    <label class="custom-file-label" for="attachment">Choose file</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="progress" style="height:5px">
+                    <div id="upload_progress" class="progress-bar bg-success" style="height:10px"></div>
+                </div>
+            </div>
+            <p class="small">Người dùng chỉ được upload tập tin có kích thước tối đa là 20 MB. Các tập tin thực thi
+                (*.exe, *.msi, *.sh) không được phép upload.</p>
+            <p class="small">Khi nhấn nút upload thì</p>
+            <ul class="small">
+                <li>Progress bar sẽ hiển thị tiến độ của quá trình upload. Ban đầu progress bar bị ẩn đi.</li>
+                <li>Khi đang diễn ra quá trình upload thì button <strong>Upload</strong> sẽ bị disabled.</li>
+                <li>Sau khi upload thành công thì progress bar được ẩn đi, file sẽ được hiển thị trong danh sách bên
+                    trên và button được enabled trở lại.</li>
+            </ul>
+            <button id="uploadButton" type="button" class="btn btn-success px-5">Upload</button>
+        </div>
+
+    </div>
+
+
+    <!-- Delete dialog -->
+    <div class="modal fade" id="confirm-delete">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Xóa tập tin</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    Bạn có chắc rằng muốn xóa tập tin <strong>image.jpg</strong>
+                </div>
+
+                <div class="modal-footer">
+                    <button id="confirm-delete-btn" type="button" class="btn btn-danger"
+                        data-dismiss="modal">Xóa</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Rename dialog -->
+    <div class="modal fade" id="confirm-rename">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Đổi tên</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Nhập tên mới cho tập tin <strong></strong></p>
+                    <input id="newName" type="text" placeholder="Nhập tên mới" class="form-control" />
+                </div>
+
+                <div class="modal-footer">
+                    <button id="confirm-rename-btn" type="button" class="btn btn-primary"
+                        data-dismiss="modal">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New file dialog -->
+    <div class="modal fade" id="new-file-dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Tạo tập tin mới</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="name">File Name</label>
+                        <input type="text" placeholder="File name" class="form-control" id="newFileName" />
+                    </div>
+                    <div class="form-group">
+                        <label for="content">Nội dung</label>
+                        <textarea rows="10" id="content" class="form-control" placeholder="Nội dung"></textarea>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button id="createFile_btn" type="button" class="btn btn-success" data-dismiss="modal">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New folder dialog -->
+    <div class="modal fade" id="new-folder-dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Tạo thư mục mới</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="name">Folder Name</label>
+                        <input type="text" placeholder="Folder name" class="form-control" id="newFolderName" />
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button id="createFolder_btn" type="button" class="btn btn-success"
+                        data-dismiss="modal">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- message dialog -->
+    <div class="modal fade" id="message-dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Xóa file</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Bạn không được cấp quyền để xóa tập tin/thư mục này</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{!--
+    <script src="../public/js/FileManagement.js">
+
+    </script> --}}
+    <script>
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+
+        //upload file
+        $("#uploadButton").click(() => {
+            let upload = document.getElementById("attachment")
+            let dir = $("#user").attr("data-dir")
+            if (upload.files.length === 0) {
+                return alert("vui lòng chọn file")
+            }
+            let file = upload.files[0]
+            let form = new FormData()
+            form.set("attachment", file)
+            form.set("dir", dir)
+            let xhr = new XMLHttpRequest()
+            xhr.open("POST", "http://localhost:3000/upload", true)
+            xhr.addEventListener("load", e => {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const json = JSON.parse(xhr.responseText)
+                    console.log(json)
+                }
+            })
+            xhr.upload.addEventListener("progress", e => {
+                let loaded = e.loaded
+                let total = e.total
+                let progress = Math.round(loaded * 100 / total)
+                $("#upload_progress").css("width", progress + "%")
+            })
+            xhr.send(form)
+        })
+        // delete file
+        $(".delete").click(e => {
+            let tr = e.target.parentNode.parentElement
+            let fileName = tr.dataset.file
+            $("#confirm-delete strong").html(fileName)
+            $('#confirm-delete-btn').attr("data-file", fileName)
+            $('#confirm-delete').modal("show")
+        })
+
+        $('#confirm-delete-btn').click(e => {
+            let fileName = e.target.dataset.file
+            let ext = e.target.dataset.file || ""
+            let dir = $("#user").attr("data-dir")
+            let file = {
+                fileName,
+                dir,
+                ext: ext || undefined
+            }
+            fetch("http://localhost:3000/delete", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(file)
+            })
+                .then(res => res.json())
+                .then(json => {
+                    if (json.code === 0) {
+                        location.reload()
+                    }
+                })
+                .catch(e => console.log(e))
+        })
+
+        $(".rename").click(e => {
+            let tr = e.target.parentNode.parentElement
+            let fileName = tr.dataset.file
+            let ext = tr.dataset.ext
+            $("#confirm-rename strong").html(fileName)
+            $('#confirm-rename-btn').attr("data-file", fileName)
+            $('#confirm-rename-btn').attr("data-ext", ext)
+            $('#confirm-rename').modal("show")
+        })
+
+        $('#confirm-rename-btn').click(e => {
+            let fileName = e.target.dataset.file
+            let dir = $("#user").attr("data-dir")
+            let ext = e.target.dataset.ext
+            let newName = $("#newName").val()
+            newName = newName.replace(ext, "")
+            newName = newName + ext
+            console.log(newName)
+            let rename = {
+                fileName,
+                dir,
+                newName
+            }
+
+            fetch("http://localhost:3000/rename", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(rename)
+            })
+                .then(res => res.json())
+                .then(json => {
+                    if (json.code === 0) {
+                        location.reload()
+                    }
+                })
+                .catch(e => console.log(e))
+        })
+        // create text file
+        $("#create_file").click(e => {
+            $("#new-file-dialog").modal("show")
+        })
+
+        $("#createFile_btn").click(e => {
+            let name = $("#newFileName").val()
+            let dir = $("#user").attr("data-dir")
+            let content = $("#content").val()
+            let newfile = {
+                name,
+                content,
+                dir
+            }
+            fetch("http://localhost:3000/create", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newfile)
+            })
+                .then(res => res.json())
+                .then(json => {
+                    if (json.code === 0) {
+                        location.reload()
+                    }
+                })
+                .catch(e => console.log(e))
+        })
+
+        //create folder
+        $("#create_folder").click(e => {
+            $("#new-folder-dialog").modal("show")
+        })
+
+        $("#createFolder_btn").click(e => {
+            let name = $("#newFolderName").val()
+            let dir = $("#user").attr("data-dir")
+            let newfolder = {
+                name,
+                dir
+            }
+            fetch("http://localhost:3000/new", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newfolder)
+            })
+                .then(res => res.json())
+                .then(json => {
+                    if (json.code === 0) {
+                        location.reload()
+                    }
+                })
+                .catch(e => console.log(e))
+        })
+
+        {
+            {
+                !-- // download
+                    $(".download").click(e => {
+                        let tr = e.target.parentNode.parentElement
+                        let fileName = tr.dataset.file
+                        let dir = $("#user").attr("data-dir")
+                        let download = {
+                            fileName,
+                            dir
+                        }
+                        fetch("http://localhost:3000/download", {
+                            method: "POST",
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(download)
+                        })
+                            .then(res => res.json())
+                            .then(json => {
+                                console.log(json)
+                            })
+                            .catch(e => console.log(e))
+                    }) --}
+        }
+    </script>
+
+
+</body>
+
+</html>
