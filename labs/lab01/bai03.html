@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h3>Bài tập tải ảnh động bằng Ajax</h3>
+        <div class="mt-3">
+            <input style="width: 30%;" type="text" id="url">
+            <button id="viewImage" type="button" class="btn btn-danger">Xem ảnh</button>
+        </div>
+        <div>
+            <a href="#" download="myimage.jpg" id="link">
+
+                <img src="" style="max-width: 50%;" alt="" class="mt-5" id="img">
+            </a>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // $(document).ready(() => {
+        //     $("#viewImage").click(() =>{
+        //         console.log("here")
+        //     });
+        // });
+        let img = document.getElementById("img"),
+            imgLink = document.getElementById("link"),
+            btnView = document.getElementById("viewImage"),
+            url = document.getElementById("url")
+
+        // Cách dùng Promise
+
+        // btnView.addEventListener("click",() => {
+        //     let link = url.value
+        //     url.value = ""
+        //     loadIamge(link).then(result => {
+        //         img.src = URL.createObjectURL(result)
+        //         imgLink.href = URL.createObjectURL(result)
+        //     }).catch(e=>console.log(e))
+        // })
+
+        // Cách dùng async/await
+
+        btnView.addEventListener("click", async () => {
+            let link = url.value
+            url.value = ""
+            try {
+                data = await loadImage(link)
+                img.src = URL.createObjectURL(data)
+                imgLink.href = URL.createObjectURL(data)
+            }
+            catch (e) {
+                console.log(e)
+            }
+        })
+
+        function loadImage(url) {
+            return new Promise((resolve, reject) => {
+                let xhr = new XMLHttpRequest()
+                xhr.responseType = "blob"
+                xhr.addEventListener('load', e => {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            let data = xhr.response
+                            resolve(data)
+                        }
+                        else reject("Hình của bạn không xem được")
+                    }
+                })
+                xhr.open("GET", url, true);
+                xhr.onerror = e => reject(e)
+                xhr.send();
+            })
+        }
+    </script>
+
+</body>
+
+</html>
