@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Trang chủ - Danh sách sản phẩm</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+    <div class="container my-3">
+        <h4 class="text-primary">Danh sách người dùng</h4>
+        <a href="/add" class="btn btn-success btn-sm my-2">Thêm người dùng</a>
+        <p>Chọn một người dùng cụ thể để xem chi tiết</p>
+        <table class="table table-striped">
+
+            <thead>
+                <tr>
+                    <td>STT</td>
+                    <td>Name</td>
+                    <td>Account</td>
+                    <td>Action</td>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each users as | user |}}
+                <tr id="{{user.email}}">
+                    <td>{{@index}}</td>
+                    <td><a href="/user/{{user.email}}">{{user.name}}</a></td>
+                    <td>{{user.email}}</td>
+                    <td>
+                        <a href="/edit/{{user.email}}">Chỉnh sửa</a> |
+                        <a data-email="{{user.email}}" data-name="{{user.name}}" class="delete-btn"
+                            href="/remove/{{user.email}}">Xóa</a>
+                    </td>
+                </tr>
+                {{/each}}
+
+            </tbody>
+        </table>
+    </div>
+
+    {{#if addFlash}}
+    <div id="add-flash-alert" class="alert alert-success text-center w-25 mx-auto my-3">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <span>{{addFlash}} <strong></strong></span>
+    </div>
+    {{/if}}
+
+    {{#if editFlash}}
+    <div id="edit-flash-alert" class="alert alert-success text-center w-25 mx-auto my-3">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <span>{{editFlash}} <strong></strong></span>
+    </div>
+    {{/if}}
+
+    {{#if deleteFlash}}
+    <div id="delete-flash-alert" class="alert alert-success text-center w-25 mx-auto my-3">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <span>{{deleteFlash}} <strong></strong></span>
+    </div>
+    {{/if}}
+
+    <!-- Delete Confirm Modal -->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <hp class="modal-title">Xóa người dùng</hp>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc rằng muốn xóa <strong class="product-name">iPhone XS MAX</strong> ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger btn-comfirm">Xóa</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        setTimeout(() => {
+            $('#add-flash-alert').fadeOut(2000)
+        }, 1000);
+        setTimeout(() => {
+            $('#edit-flash-alert').fadeOut(2000)
+        }, 1000);
+        setTimeout(() => {
+            $('#delete-flash-alert').fadeOut(2000)
+        }, 1000);
+        $('tbody .delete-btn').click(e => {
+            e.preventDefault();
+            let name = $(e.target).data('name')
+            let email = $(e.target).data('email')
+
+            // show detail of product 
+            $("#myModal .product-name").html(name)
+            $("#myModal .btn-comfirm").attr('data-email', email)
+
+            // show dialog 
+            $("#myModal").modal('show')
+        })
+
+        $("#myModal .btn-comfirm").click(e => {
+            let email = e.target.dataset.email
+            $("#myModal").modal('hide')
+            deleteProduct(email)
+        })
+        function deleteProduct(email) {
+            fetch('http://localhost:8080/delete', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `email=${encodeURIComponent(email)}`
+            }
+            ).then(res => res.json())
+                .then(json => {
+                    if (json.code === 0) {
+                        console.log("done")
+                        location.reload()
+                    }
+                    else {
+                        console.log(json.message)
+                    }
+                    console.log(json.code)
+                })
+                .catch(e => console.log(e))
+        }
+    </script>
+
+</body>
+
+</html>

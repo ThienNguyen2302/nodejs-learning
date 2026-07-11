@@ -1,0 +1,29 @@
+<!doctype html>
+
+<html>
+
+<head>
+
+<title>Web Travel</title>
+<link rel="stylesheet" href="/css/bootstrap.css">
+</head>
+
+<body>
+
+    <header>
+
+    <img src="/img/logo.png" style="width: 100px;" alt="Web Travel Logo">
+
+    </header>
+    {{#if flash}}
+        <div class="alert alert-dismissible alert-{{flash.type}}">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times ; <button>
+            <strong>{{flash.intro}}</strong> {{{flash.message}}}
+        </div>
+    {{/if}}
+
+    {{{body}}}
+
+</body>
+<script language="javascript" src="/js/bootstrap.js"></script>
+</html>
